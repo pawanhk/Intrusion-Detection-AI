@@ -160,9 +160,34 @@ x_testing_normalized  = scaler_logistic_regression.transform(x_testing_dropped)
 
 # STEP 5 - Create the neural net class now 
 # use the neural net module 
-class NeuralNetKDD90(nn.module):
+class NeuralNetKDD90(nn.Module):
+    # start with the init part 
     def __init__(self, input_size, hidden_size, output_size):
-        super(NeuralNetKDD90,self).__init__()
-    
+        # first call is to super to set the values 
+        super(NeuralNetKDD90,self).__init__() 
+        # inputs -> hidden layers + the function to add the bias -> outputs 
+        
+        # incoming inputs need to get mapped to the first set of hidden layers 
+        self.fc1 = nn.Linear(input_size,hidden_size)
+        # from these layers the get mapped to the outputs 
+        self.fc2 = nn.Linear(hidden_size,output_size)
+        
+        # use ReLU to decide if the input -> hidden layer -> output path should be there
+        self.relu = nn.ReLU()
+        
+    # now it needs to be forwarded ahead
+    def forward(self, x):
+        forwarded_x = x
+        # output needs to be forwarded along as input --> activation --> output
+        # so first the weights get multiplied here and the bias is added here
+        forwarded_x = self.fc1(forwarded_x)
+        forwarded_x  = self.relu(forwarded_x)
+        # weights and bias to the last layer before it goes to the output
+        forwarded_x = self.fc2(forwarded_x)
+        
+        # before returning, x needs to be normalized as done before in logistic regression
+        forawrded_x = F.log_softmax(forwarded_x, dim=1)
+        return forwarded_x
+        
     
 
